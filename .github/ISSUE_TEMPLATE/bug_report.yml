@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible problem with Explorer Dock
+title: "[Bug] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please provide as much detail as possible.
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Explorer Dock version
+      placeholder: "0.2.3"
+    validations:
+      required: true
+
+  - type: input
+    id: obs-version
+    attributes:
+      label: OBS Studio version
+      placeholder: "32.x.x"
+    validations:
+      required: true
+
+  - type: input
+    id: windows-version
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open OBS
+        2. Open ...
+        3. Click ...
+        4. The problem occurs
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant OBS log
+      description: Paste the relevant part of the OBS log here.
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: Screenshots, videos or anything else that may help.
