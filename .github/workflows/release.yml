@@ -1,0 +1,71 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, for example 0.2.3'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows-x64:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate version
+        id: version
+        shell: pwsh
+        run: |
+          $requested = '${{ inputs.version }}'
+          $spec = Get-Content 'buildspec.json' -Raw | ConvertFrom-Json
+          if ($requested -ne $spec.version) {
+            throw "Requested version $requested does not match buildspec version $($spec.version)."
+          }
+          "version=$requested" >> $env:GITHUB_OUTPUT
+
+      - name: Build Explorer Dock
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy -Scope Process Bypass
+          ./build-windows.ps1 -Configuration RelWithDebInfo
+
+      - name: Prepare release package
+        id: package
+        shell: pwsh
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $packageRoot = Join-Path $PWD 'package'
+          $pluginBin = Join-Path $packageRoot 'obs-plugins/64bit'
+          $pluginData = Join-Path $packageRoot 'data/obs-plugins/obs-explorer-dock'
+          $localeDir = Join-Path $pluginData 'locale'
+
+          New-Item -ItemType Directory -Force -Path $pluginBin | Out-Null
+          New-Item -ItemType Directory -Force -Path $localeDir | Out-Null
+
+          Copy-Item 'dist/obs-explorer-dock.dll' (Join-Path $pluginBin 'obs-explorer-dock.dll') -Force
+          if (Test-Path 'dist/obs-explorer-dock.pdb') {
+            Copy-Item 'dist/obs-explorer-dock.pdb' (Join-Path $pluginBin 'obs-explorer-dock.pdb') -Force
+          }
+
+          Copy-Item 'data/manifest.json' (Join-Path $pluginData 'manifest.json') -Force
+          Copy-Item 'data/locale/*' $localeDir -Force
+
+          $zipName = "Explorer-Dock-v$version-Windows-x64.zip"
+          Compress-Archive -Path (Join-Path $packageRoot '*') -DestinationPath $zipName -Force
+          "zipName=$zipName" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $tag = "v$version"
+          $zip = '${{ steps.package.outputs.zipName }}'
+          gh release create $tag $zip --title "Explorer Dock v$version" --notes-file RELEASE_NOTES.md --target $env:GITHUB_SHA

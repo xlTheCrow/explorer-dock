@@ -19,7 +19,7 @@ jobs:
           $spec = Get-Content "buildspec.json" -Raw | ConvertFrom-Json
           "version=$($spec.version)" >> $env:GITHUB_OUTPUT
 
-      - name: Build OBS Explorer Dock
+      - name: Build Explorer Dock
         shell: pwsh
         run: |
           Set-ExecutionPolicy -Scope Process Bypass
@@ -45,7 +45,7 @@ jobs:
           Copy-Item "data/manifest.json" (Join-Path $pluginData "manifest.json") -Force
           Copy-Item "data/locale/*" $localeDir -Force
 
-          $zipName = "OBS-Explorer-Dock-v$version-Windows-x64.zip"
+          $zipName = "Explorer-Dock-v$version-Windows-x64.zip"
           Compress-Archive -Path (Join-Path $packageRoot "*") -DestinationPath $zipName -Force
           "zipName=$zipName" >> $env:GITHUB_OUTPUT
         id: package
@@ -53,7 +53,7 @@ jobs:
       - name: Upload ready-to-install package
         uses: actions/upload-artifact@v4
         with:
-          name: OBS-Explorer-Dock-v${{ steps.version.outputs.version }}-Windows-x64
+          name: Explorer-Dock-v${{ steps.version.outputs.version }}-Windows-x64
           path: |
             ${{ steps.package.outputs.zipName }}
             dist/obs-explorer-dock.dll
