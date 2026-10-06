@@ -1,6 +1,7 @@
 #include "explorer-dock-manager.hpp"
 #include "explorer-browser-widget.hpp"
 #include "plugin-main.hpp"
+#include "ui-text.hpp"
 
 #include <obs-frontend-api.h>
 
@@ -80,7 +81,7 @@ QList<ExplorerDockConfig> ExplorerDockManager::loadConfig() const
         if (config.id.isEmpty())
             config.id = newDockId();
         if (config.name.isEmpty())
-            config.name = text("DefaultDockName");
+            config.name = uiText("DefaultDockName");
         if (config.path.isEmpty())
             config.path = QDir::homePath();
 
@@ -179,7 +180,7 @@ void ExplorerDockManager::appendRow(QTableWidget *table, const ExplorerDockConfi
     auto *pathEdit = new QLineEdit(config.path.isEmpty() ? QDir::homePath() : config.path, table);
     table->setCellWidget(row, 1, pathEdit);
 
-    auto *browseButton = new QPushButton(text("Manager.Browse"), table);
+    auto *browseButton = new QPushButton(uiText("Manager.Browse"), table);
     table->setCellWidget(row, 2, browseButton);
     QObject::connect(browseButton, &QPushButton::clicked, table, [table, browseButton]() {
         const int currentRow = table->indexAt(browseButton->pos()).row();
@@ -194,7 +195,7 @@ void ExplorerDockManager::appendRow(QTableWidget *table, const ExplorerDockConfi
     });
 
     auto *deleteButton = new QPushButton(QStringLiteral("×"), table);
-    deleteButton->setToolTip(text("Manager.Delete"));
+    deleteButton->setToolTip(uiText("Manager.Delete"));
     deleteButton->setFixedWidth(32);
     table->setCellWidget(row, 3, deleteButton);
     QObject::connect(deleteButton, &QPushButton::clicked, table, [table, deleteButton]() {
@@ -240,16 +241,16 @@ void ExplorerDockManager::openManager()
 
     managerDialog_ = new QDialog();
     managerDialog_->setAttribute(Qt::WA_DeleteOnClose);
-    managerDialog_->setWindowTitle(text("Manager.Title"));
+    managerDialog_->setWindowTitle(uiText("Manager.Title"));
     managerDialog_->resize(860, 430);
 
     auto *layout = new QVBoxLayout(managerDialog_);
-    auto *description = new QLabel(text("Manager.Description"), managerDialog_);
+    auto *description = new QLabel(uiText("Manager.Description"), managerDialog_);
     description->setWordWrap(true);
     layout->addWidget(description);
 
     auto *table = new QTableWidget(0, 4, managerDialog_);
-    table->setHorizontalHeaderLabels({text("Manager.DockName"), text("Manager.StartFolder"), QString(), QString()});
+    table->setHorizontalHeaderLabels({uiText("Manager.DockName"), uiText("Manager.StartFolder"), QString(), QString()});
     table->verticalHeader()->setVisible(false);
     table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -261,12 +262,12 @@ void ExplorerDockManager::openManager()
         appendRow(table, config);
 
     auto *bottom = new QHBoxLayout();
-    auto *addButton = new QPushButton(text("Manager.Add"), managerDialog_);
+    auto *addButton = new QPushButton(uiText("Manager.Add"), managerDialog_);
     bottom->addWidget(addButton);
     bottom->addStretch();
 
-    auto *applyButton = new QPushButton(text("Manager.Apply"), managerDialog_);
-    auto *closeButton = new QPushButton(text("Manager.Close"), managerDialog_);
+    auto *applyButton = new QPushButton(uiText("Manager.Apply"), managerDialog_);
+    auto *closeButton = new QPushButton(uiText("Manager.Close"), managerDialog_);
     bottom->addWidget(applyButton);
     bottom->addWidget(closeButton);
     layout->addLayout(bottom);
@@ -274,7 +275,7 @@ void ExplorerDockManager::openManager()
     QObject::connect(addButton, &QPushButton::clicked, managerDialog_, [this, table]() {
         ExplorerDockConfig config;
         config.id = newDockId();
-        config.name = text("DefaultDockName");
+        config.name = uiText("DefaultDockName");
         config.path = QDir::homePath();
         appendRow(table, config);
     });
