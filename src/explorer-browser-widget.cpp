@@ -1,5 +1,6 @@
 #include "explorer-browser-widget.hpp"
 #include "plugin-main.hpp"
+#include "ui-text.hpp"
 
 #include <windows.h>
 #include <shlobj.h>
@@ -114,16 +115,16 @@ ExplorerBrowserWidget::ExplorerBrowserWidget(const QString &initialPath, QWidget
         toolbarLayout->addWidget(button);
     }
 
-    backButton_->setToolTip(text("Dock.Back"));
-    forwardButton_->setToolTip(text("Dock.Forward"));
-    upButton_->setToolTip(text("Dock.Up"));
-    refreshButton_->setToolTip(text("Dock.Refresh"));
+    backButton_->setToolTip(uiText("Dock.Back"));
+    forwardButton_->setToolTip(uiText("Dock.Forward"));
+    upButton_->setToolTip(uiText("Dock.Up"));
+    refreshButton_->setToolTip(uiText("Dock.Refresh"));
 
     pathEdit_ = new QLineEdit(this);
-    pathEdit_->setPlaceholderText(text("Dock.PathPlaceholder"));
+    pathEdit_->setPlaceholderText(uiText("Dock.PathPlaceholder"));
     toolbarLayout->addWidget(pathEdit_, 1);
 
-    auto *goButton = new QPushButton(text("Dock.Go"), this);
+    auto *goButton = new QPushButton(uiText("Dock.Go"), this);
     goButton->setFixedWidth(44);
     toolbarLayout->addWidget(goButton);
 
@@ -152,7 +153,7 @@ ExplorerBrowserWidget::ExplorerBrowserWidget(const QString &initialPath, QWidget
     (void)nativeHost_->winId();
 
     if (!initializeBrowser()) {
-        setStatusText(text("Dock.InitFailed"), true);
+        setStatusText(uiText("Dock.InitFailed"), true);
         return;
     }
 
@@ -256,7 +257,7 @@ void ExplorerBrowserWidget::navigateTo(const QString &path)
     const std::wstring widePath = trimmed.toStdWString();
     HRESULT hr = SHParseDisplayName(widePath.c_str(), nullptr, &pidl, 0, &attrs);
     if (FAILED(hr) || !pidl) {
-        setStatusText(text("Dock.InvalidPath").arg(trimmed).arg(hresultText(hr)), true);
+        setStatusText(uiText("Dock.InvalidPath").arg(trimmed).arg(hresultText(hr)), true);
         return;
     }
 
@@ -264,7 +265,7 @@ void ExplorerBrowserWidget::navigateTo(const QString &path)
     CoTaskMemFree(pidl);
 
     if (FAILED(hr)) {
-        setStatusText(text("Dock.NavigationFailed").arg(trimmed).arg(hresultText(hr)), true);
+        setStatusText(uiText("Dock.NavigationFailed").arg(trimmed).arg(hresultText(hr)), true);
         return;
     }
 
@@ -277,7 +278,7 @@ void ExplorerBrowserWidget::navigateBack()
         return;
     const HRESULT hr = browser_->BrowseToIDList(nullptr, SBSP_NAVIGATEBACK);
     if (FAILED(hr))
-        setStatusText(text("Dock.NoBackHistory"), false);
+        setStatusText(uiText("Dock.NoBackHistory"), false);
 }
 
 void ExplorerBrowserWidget::navigateForward()
@@ -286,7 +287,7 @@ void ExplorerBrowserWidget::navigateForward()
         return;
     const HRESULT hr = browser_->BrowseToIDList(nullptr, SBSP_NAVIGATEFORWARD);
     if (FAILED(hr))
-        setStatusText(text("Dock.NoForwardHistory"), false);
+        setStatusText(uiText("Dock.NoForwardHistory"), false);
 }
 
 void ExplorerBrowserWidget::navigateUp()
@@ -295,7 +296,7 @@ void ExplorerBrowserWidget::navigateUp()
         return;
     const HRESULT hr = browser_->BrowseToIDList(nullptr, SBSP_PARENT);
     if (FAILED(hr))
-        setStatusText(text("Dock.NoParent"), false);
+        setStatusText(uiText("Dock.NoParent"), false);
 }
 
 void ExplorerBrowserWidget::refreshView()
@@ -326,7 +327,7 @@ void ExplorerBrowserWidget::handleNavigationComplete(const void *absolutePidl)
 void ExplorerBrowserWidget::handleNavigationFailed(const void *absolutePidl)
 {
     const QString path = pidlToDisplayPath(absolutePidl);
-    setStatusText(text("Dock.NavigationFailedSimple").arg(path), true);
+    setStatusText(uiText("Dock.NavigationFailedSimple").arg(path), true);
 }
 
 QString ExplorerBrowserWidget::pidlToDisplayPath(const void *absolutePidl) const
