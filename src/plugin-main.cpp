@@ -5,6 +5,9 @@
 #include <windows.h>
 #include <ole2.h>
 
+OBS_DECLARE_MODULE()
+OBS_MODULE_USE_DEFAULT_LOCALE("obs-explorer-dock", "en-US")
+
 namespace {
 ExplorerDockManager g_manager;
 bool g_oleInitialized = false;
