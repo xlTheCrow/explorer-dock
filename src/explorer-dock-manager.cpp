@@ -181,7 +181,7 @@ void ExplorerDockManager::appendRow(QTableWidget *table, const ExplorerDockConfi
 
     auto *browseButton = new QPushButton(text("Manager.Browse"), table);
     table->setCellWidget(row, 2, browseButton);
-    connect(browseButton, &QPushButton::clicked, table, [table, browseButton]() {
+    QObject::connect(browseButton, &QPushButton::clicked, table, [table, browseButton]() {
         const int currentRow = table->indexAt(browseButton->pos()).row();
         if (currentRow < 0)
             return;
@@ -197,7 +197,7 @@ void ExplorerDockManager::appendRow(QTableWidget *table, const ExplorerDockConfi
     deleteButton->setToolTip(text("Manager.Delete"));
     deleteButton->setFixedWidth(32);
     table->setCellWidget(row, 3, deleteButton);
-    connect(deleteButton, &QPushButton::clicked, table, [table, deleteButton]() {
+    QObject::connect(deleteButton, &QPushButton::clicked, table, [table, deleteButton]() {
         const int currentRow = table->indexAt(deleteButton->pos()).row();
         if (currentRow >= 0)
             table->removeRow(currentRow);
@@ -271,7 +271,7 @@ void ExplorerDockManager::openManager()
     bottom->addWidget(closeButton);
     layout->addLayout(bottom);
 
-    connect(addButton, &QPushButton::clicked, managerDialog_, [this, table]() {
+    QObject::connect(addButton, &QPushButton::clicked, managerDialog_, [this, table]() {
         ExplorerDockConfig config;
         config.id = newDockId();
         config.name = text("DefaultDockName");
@@ -279,18 +279,18 @@ void ExplorerDockManager::openManager()
         appendRow(table, config);
     });
 
-    connect(applyButton, &QPushButton::clicked, managerDialog_, [this, table]() {
+    QObject::connect(applyButton, &QPushButton::clicked, managerDialog_, [this, table]() {
         configs_ = readRows(table);
         saveConfig(configs_);
         rebuildAllDocks();
     });
 
-    connect(closeButton, &QPushButton::clicked, managerDialog_, [this]() {
+    QObject::connect(closeButton, &QPushButton::clicked, managerDialog_, [this]() {
         if (managerDialog_)
             managerDialog_->close();
     });
 
-    connect(managerDialog_, &QDialog::destroyed, [this]() { managerDialog_ = nullptr; });
+    QObject::connect(managerDialog_, &QDialog::destroyed, [this]() { managerDialog_ = nullptr; });
     managerDialog_->show();
 }
 
