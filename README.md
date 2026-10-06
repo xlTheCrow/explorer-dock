@@ -33,9 +33,19 @@ For v0.2.3, download:
 - German and English interface strings
 - Versioned, ready-to-install Windows packages
 
-## Screenshot
+## Screenshots
 
-A current screenshot of Explorer Dock v0.2.3 will be added here soon.
+### Dock management
+
+![Explorer Dock management dialog](docs/screenshots/explorer-dock-manager.jpg)
+
+Create and manage multiple Explorer docks, choose their names and assign a start folder.
+
+### Explorer Dock in OBS
+
+![Explorer Dock browser view](docs/screenshots/explorer-dock-browser.jpg)
+
+The dock provides native Windows Explorer thumbnails, navigation controls and direct access to your files inside OBS.
 
 ## Requirements
 
