@@ -12,46 +12,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Read plugin version
+        id: version
+        shell: pwsh
+        run: |
+          $spec = Get-Content "buildspec.json" -Raw | ConvertFrom-Json
+          "version=$($spec.version)" >> $env:GITHUB_OUTPUT
+
       - name: Build OBS Explorer Dock
         shell: pwsh
         run: |
           Set-ExecutionPolicy -Scope Process Bypass
           ./build-windows.ps1 -Configuration RelWithDebInfo
 
-      - name: Prepare current OBS package
+      - name: Prepare OBS package
         shell: pwsh
         run: |
-          $out = Join-Path $PWD "package-current/obs-explorer-dock"
-          New-Item -ItemType Directory -Force -Path $out | Out-Null
-          New-Item -ItemType Directory -Force -Path (Join-Path $out "data/locale") | Out-Null
-          Copy-Item "dist/obs-explorer-dock.dll" (Join-Path $out "obs-explorer-dock.dll") -Force
-          if (Test-Path "dist/obs-explorer-dock.pdb") {
-            Copy-Item "dist/obs-explorer-dock.pdb" (Join-Path $out "obs-explorer-dock.pdb") -Force
-          }
-          Copy-Item "data/manifest.json" (Join-Path $out "data/manifest.json") -Force
-          Copy-Item "data/locale/*" (Join-Path $out "data/locale") -Force
-          Compress-Archive -Path "package-current/obs-explorer-dock" -DestinationPath "OBS-Explorer-Dock-OBS32-Current.zip" -Force
+          $version = "${{ steps.version.outputs.version }}"
+          $packageRoot = Join-Path $PWD "package"
+          $pluginBin = Join-Path $packageRoot "obs-plugins/64bit"
+          $pluginData = Join-Path $packageRoot "data/obs-plugins/obs-explorer-dock"
+          $localeDir = Join-Path $pluginData "locale"
 
-      - name: Prepare legacy package
-        shell: pwsh
-        run: |
-          $out = Join-Path $PWD "package-legacy/obs-explorer-dock"
-          New-Item -ItemType Directory -Force -Path (Join-Path $out "bin/64bit") | Out-Null
-          New-Item -ItemType Directory -Force -Path (Join-Path $out "data/locale") | Out-Null
-          Copy-Item "dist/obs-explorer-dock.dll" (Join-Path $out "bin/64bit/obs-explorer-dock.dll") -Force
-          if (Test-Path "dist/obs-explorer-dock.pdb") {
-            Copy-Item "dist/obs-explorer-dock.pdb" (Join-Path $out "bin/64bit/obs-explorer-dock.pdb") -Force
-          }
-          Copy-Item "data/manifest.json" (Join-Path $out "data/manifest.json") -Force
-          Copy-Item "data/locale/*" (Join-Path $out "data/locale") -Force
-          Compress-Archive -Path "package-legacy/obs-explorer-dock" -DestinationPath "OBS-Explorer-Dock-OBS32-Legacy.zip" -Force
+          New-Item -ItemType Directory -Force -Path $pluginBin | Out-Null
+          New-Item -ItemType Directory -Force -Path $localeDir | Out-Null
 
-      - name: Upload ready-to-install packages
+          Copy-Item "dist/obs-explorer-dock.dll" (Join-Path $pluginBin "obs-explorer-dock.dll") -Force
+          if (Test-Path "dist/obs-explorer-dock.pdb") {
+            Copy-Item "dist/obs-explorer-dock.pdb" (Join-Path $pluginBin "obs-explorer-dock.pdb") -Force
+          }
+
+          Copy-Item "data/manifest.json" (Join-Path $pluginData "manifest.json") -Force
+          Copy-Item "data/locale/*" $localeDir -Force
+
+          $zipName = "OBS-Explorer-Dock-v$version-Windows-x64.zip"
+          Compress-Archive -Path (Join-Path $packageRoot "*") -DestinationPath $zipName -Force
+          "zipName=$zipName" >> $env:GITHUB_OUTPUT
+        id: package
+
+      - name: Upload ready-to-install package
         uses: actions/upload-artifact@v4
         with:
-          name: OBS-Explorer-Dock-OBS32
+          name: OBS-Explorer-Dock-v${{ steps.version.outputs.version }}-Windows-x64
           path: |
-            OBS-Explorer-Dock-OBS32-Current.zip
-            OBS-Explorer-Dock-OBS32-Legacy.zip
+            ${{ steps.package.outputs.zipName }}
             dist/obs-explorer-dock.dll
             dist/obs-explorer-dock.pdb
