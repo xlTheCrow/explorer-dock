@@ -1,9 +1,11 @@
 #include "plugin-main.hpp"
 #include "explorer-dock-manager.hpp"
+#include "ui-text.hpp"
 
 #include <obs-frontend-api.h>
 #include <windows.h>
 #include <ole2.h>
+#include <QByteArray>
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-explorer-dock", "en-US")
@@ -29,7 +31,8 @@ bool obs_module_load(void)
         blog(LOG_WARNING, "[obs-explorer-dock] OleInitialize failed: 0x%08lX", static_cast<unsigned long>(oleResult));
     }
 
-    obs_frontend_add_tools_menu_item(obs_module_text("Menu.ManageExplorerDocks"), [](void *) {
+    const QByteArray menuText = uiText("Menu.ManageExplorerDocks").toUtf8();
+    obs_frontend_add_tools_menu_item(menuText.constData(), [](void *) {
         g_manager.openManager();
     }, nullptr);
 
