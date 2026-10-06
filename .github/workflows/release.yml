@@ -60,12 +60,24 @@ jobs:
           Compress-Archive -Path (Join-Path $packageRoot '*') -DestinationPath $zipName -Force
           "zipName=$zipName" >> $env:GITHUB_OUTPUT
 
-      - name: Create GitHub release
+      - name: Create or update GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           $version = '${{ steps.version.outputs.version }}'
           $tag = "v$version"
           $zip = '${{ steps.package.outputs.zipName }}'
-          gh release create $tag $zip --title "Explorer Dock v$version" --notes-file RELEASE_NOTES.md --target $env:GITHUB_SHA
+
+          gh release view $tag --repo $env:GH_REPO *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release $tag already exists. Updating release notes..."
+            gh release edit $tag --repo $env:GH_REPO --title "Explorer Dock v$version" --notes-file RELEASE_NOTES.md
+          } else {
+            Write-Host "Creating release $tag in $env:GH_REPO..."
+            gh release create $tag --repo $env:GH_REPO --title "Explorer Dock v$version" --notes-file RELEASE_NOTES.md --target $env:GITHUB_SHA
+          }
+
+          Write-Host "Uploading $zip to $env:GH_REPO..."
+          gh release upload $tag $zip --repo $env:GH_REPO --clobber
