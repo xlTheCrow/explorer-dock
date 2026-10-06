@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QStyle>
 #include <QTimer>
 #include <utility>
 
@@ -105,13 +106,19 @@ ExplorerBrowserWidget::ExplorerBrowserWidget(const QString &initialPath, QWidget
     toolbarLayout->setContentsMargins(4, 4, 4, 0);
     toolbarLayout->setSpacing(3);
 
-    backButton_ = new QPushButton(QStringLiteral("←"), this);
-    forwardButton_ = new QPushButton(QStringLiteral("→"), this);
-    upButton_ = new QPushButton(QStringLiteral("↑"), this);
-    refreshButton_ = new QPushButton(QStringLiteral("⟳"), this);
+    backButton_ = new QPushButton(this);
+    forwardButton_ = new QPushButton(this);
+    upButton_ = new QPushButton(this);
+    refreshButton_ = new QPushButton(this);
+
+    backButton_->setIcon(style()->standardIcon(QStyle::SP_ArrowBack));
+    forwardButton_->setIcon(style()->standardIcon(QStyle::SP_ArrowForward));
+    upButton_->setIcon(style()->standardIcon(QStyle::SP_ArrowUp));
+    refreshButton_->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
 
     for (auto *button : {backButton_, forwardButton_, upButton_, refreshButton_}) {
-        button->setFixedWidth(30);
+        button->setFixedSize(32, 30);
+        button->setIconSize(QSize(16, 16));
         toolbarLayout->addWidget(button);
     }
 
@@ -120,12 +127,18 @@ ExplorerBrowserWidget::ExplorerBrowserWidget(const QString &initialPath, QWidget
     upButton_->setToolTip(uiText("Dock.Up"));
     refreshButton_->setToolTip(uiText("Dock.Refresh"));
 
+    backButton_->setAccessibleName(uiText("Dock.Back"));
+    forwardButton_->setAccessibleName(uiText("Dock.Forward"));
+    upButton_->setAccessibleName(uiText("Dock.Up"));
+    refreshButton_->setAccessibleName(uiText("Dock.Refresh"));
+
     pathEdit_ = new QLineEdit(this);
     pathEdit_->setPlaceholderText(uiText("Dock.PathPlaceholder"));
     toolbarLayout->addWidget(pathEdit_, 1);
 
     auto *goButton = new QPushButton(uiText("Dock.Go"), this);
-    goButton->setFixedWidth(44);
+    goButton->setMinimumWidth(72);
+    goButton->setAccessibleName(uiText("Dock.Go"));
     toolbarLayout->addWidget(goButton);
 
     rootLayout->addLayout(toolbarLayout);
