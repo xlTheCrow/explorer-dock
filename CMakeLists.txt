@@ -37,4 +37,8 @@ target_sources(${CMAKE_PROJECT_NAME}
     src/explorer-dock-manager.hpp
 )
 
+# OBS 32 reads manifest.json from a plugin's data directory. Including it as
+# a resource also makes the module show up cleanly in the OBS plugin loader.
+target_add_resource(${CMAKE_PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/data/manifest.json")
+
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
