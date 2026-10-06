@@ -18,24 +18,40 @@ jobs:
           Set-ExecutionPolicy -Scope Process Bypass
           ./build-windows.ps1 -Configuration RelWithDebInfo
 
-      - name: Prepare install package
+      - name: Prepare current OBS package
         shell: pwsh
         run: |
-          $out = Join-Path $PWD "package/obs-explorer-dock"
+          $out = Join-Path $PWD "package-current/obs-explorer-dock"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          New-Item -ItemType Directory -Force -Path (Join-Path $out "data/locale") | Out-Null
+          Copy-Item "dist/obs-explorer-dock.dll" (Join-Path $out "obs-explorer-dock.dll") -Force
+          if (Test-Path "dist/obs-explorer-dock.pdb") {
+            Copy-Item "dist/obs-explorer-dock.pdb" (Join-Path $out "obs-explorer-dock.pdb") -Force
+          }
+          Copy-Item "data/manifest.json" (Join-Path $out "data/manifest.json") -Force
+          Copy-Item "data/locale/*" (Join-Path $out "data/locale") -Force
+          Compress-Archive -Path "package-current/obs-explorer-dock" -DestinationPath "OBS-Explorer-Dock-OBS32-Current.zip" -Force
+
+      - name: Prepare legacy package
+        shell: pwsh
+        run: |
+          $out = Join-Path $PWD "package-legacy/obs-explorer-dock"
           New-Item -ItemType Directory -Force -Path (Join-Path $out "bin/64bit") | Out-Null
           New-Item -ItemType Directory -Force -Path (Join-Path $out "data/locale") | Out-Null
           Copy-Item "dist/obs-explorer-dock.dll" (Join-Path $out "bin/64bit/obs-explorer-dock.dll") -Force
           if (Test-Path "dist/obs-explorer-dock.pdb") {
             Copy-Item "dist/obs-explorer-dock.pdb" (Join-Path $out "bin/64bit/obs-explorer-dock.pdb") -Force
           }
+          Copy-Item "data/manifest.json" (Join-Path $out "data/manifest.json") -Force
           Copy-Item "data/locale/*" (Join-Path $out "data/locale") -Force
-          Compress-Archive -Path "package/obs-explorer-dock" -DestinationPath "OBS-Explorer-Dock-Windows-x64.zip" -Force
+          Compress-Archive -Path "package-legacy/obs-explorer-dock" -DestinationPath "OBS-Explorer-Dock-OBS32-Legacy.zip" -Force
 
-      - name: Upload ready-to-install package
+      - name: Upload ready-to-install packages
         uses: actions/upload-artifact@v4
         with:
-          name: OBS-Explorer-Dock-Windows-x64
+          name: OBS-Explorer-Dock-OBS32
           path: |
-            OBS-Explorer-Dock-Windows-x64.zip
+            OBS-Explorer-Dock-OBS32-Current.zip
+            OBS-Explorer-Dock-OBS32-Legacy.zip
             dist/obs-explorer-dock.dll
             dist/obs-explorer-dock.pdb
