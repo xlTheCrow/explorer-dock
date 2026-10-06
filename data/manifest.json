@@ -5,8 +5,8 @@
   "version": "0.2.3",
   "description": "Native Windows Explorer browser docks for OBS Studio.",
   "urls": {
-    "repository": "https://github.com/xlTheCrow/obs-explorer-dock",
-    "website": "https://github.com/xlTheCrow/obs-explorer-dock",
-    "support": "https://github.com/xlTheCrow/obs-explorer-dock/issues"
+    "repository": "https://github.com/xlTheCrow/explorer-dock",
+    "website": "https://github.com/xlTheCrow/explorer-dock",
+    "support": "https://github.com/xlTheCrow/explorer-dock/issues"
   }
 }
