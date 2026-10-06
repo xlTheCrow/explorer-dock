@@ -2,7 +2,7 @@
   "display_name": "OBS Explorer Dock",
   "name": "obs-explorer-dock",
   "id": "de.einfachsmon.obs-explorer-dock",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Native Windows Explorer browser docks for OBS Studio.",
   "urls": {
     "repository": "https://github.com/xlTheCrow/obs-explorer-dock",
