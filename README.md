@@ -6,9 +6,9 @@
 [![License](https://img.shields.io/github/license/xlTheCrow/explorer-dock)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%20x64-blue)
 
-**Explorer Dock** is a Windows-only plugin for OBS Studio that embeds a native Windows Explorer browser directly into an OBS dock.
+**Explorer Dock** is a free, open-source **OBS Studio plugin for Windows** that embeds a native **Windows Explorer / file browser dock directly inside OBS Studio**.
 
-It is designed for creators who want quick access to recordings, clips, thumbnails, project files and other folders without constantly switching away from OBS.
+It is designed for streamers, video editors and creators who want faster access to **recordings, clips, thumbnails, project files and media folders** without constantly switching away from OBS. Explorer Dock works with **Windows 10 and Windows 11** and is currently built for **OBS Studio 32.x (64-bit)**.
 
 > Current release: **v0.2.3** · Built for **OBS Studio 32.x / Windows x64**
 
@@ -20,7 +20,7 @@ For v0.2.3, download:
 
 `Explorer-Dock-v0.2.3-Windows-x64.zip`
 
-## Features
+## OBS Studio Windows Explorer Dock – Features
 
 - Native Windows Explorer view directly inside OBS Studio
 - Multiple independent Explorer docks
@@ -47,7 +47,7 @@ Create and manage multiple Explorer docks, choose their names and assign a start
 
 The dock provides native Windows Explorer thumbnails, navigation controls and direct access to your files inside OBS.
 
-## Requirements
+## Requirements and compatibility
 
 - Windows 10 or Windows 11
 - 64-bit Windows
@@ -55,7 +55,7 @@ The dock provides native Windows Explorer thumbnails, navigation controls and di
 
 Other OBS versions may work, but are not currently guaranteed.
 
-## Installation
+## Install Explorer Dock for OBS Studio
 
 1. Close OBS Studio completely.
 2. Open the [latest release](https://github.com/xlTheCrow/explorer-dock/releases/latest).
@@ -83,7 +83,7 @@ data\
             └── en-US.ini
 ```
 
-## Usage
+## Using the file browser dock in OBS Studio
 
 Each dock behaves like a lightweight Windows Explorer embedded into OBS.
 
@@ -171,3 +171,8 @@ See [LICENSE](LICENSE) for the full license text.
 ## Disclaimer
 
 Explorer Dock is an independent community project and is **not affiliated with or endorsed by the OBS Project**.
+
+
+## Keywords
+
+OBS Studio plugin, Windows Explorer dock, OBS file browser, OBS dock plugin, Windows 11 OBS plugin, Windows 10 OBS plugin, creator workflow, recordings browser, clips browser, media file management.
