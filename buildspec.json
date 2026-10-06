@@ -38,7 +38,7 @@
   },
   "name": "obs-explorer-dock",
   "displayName": "OBS Explorer Dock",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Simon / OpenAI",
   "website": "https://github.com/xlTheCrow/obs-explorer-dock",
   "email": ""
