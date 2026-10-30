@@ -36,7 +36,12 @@ jobs:
           }
 
           gh release view "v0.2.4" --repo $env:GH_REPO *> $null
-          if ($LASTEXITCODE -eq 0) {
+          $releaseLookupExitCode = $LASTEXITCODE
+          # A missing release is expected on the first publication. Reset the
+          # native-command exit code so PowerShell does not fail the step at exit.
+          $LASTEXITCODE = 0
+
+          if ($releaseLookupExitCode -eq 0) {
             Write-Host "Release v0.2.4 already exists. Nothing to publish."
             "publish=false" >> $env:GITHUB_OUTPUT
           } else {
