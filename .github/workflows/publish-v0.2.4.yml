@@ -1,0 +1,93 @@
+name: Publish Explorer Dock v0.2.4
+
+on:
+  workflow_run:
+    workflows: ["Build Windows Packages"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    name: Publish v0.2.4 after successful Windows builds
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-2022
+    steps:
+      - name: Checkout the exact commit that was built
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Check whether v0.2.4 should be published
+        id: gate
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $spec = Get-Content "buildspec.json" -Raw | ConvertFrom-Json
+          if ($spec.version -ne "0.2.4") {
+            Write-Host "This one-time publisher is only for v0.2.4. Current version: $($spec.version)"
+            "publish=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+
+          gh release view "v0.2.4" --repo $env:GH_REPO *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Release v0.2.4 already exists. Nothing to publish."
+            "publish=false" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Release v0.2.4 does not exist yet. Preparing publication."
+            "publish=true" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Download the two verified Windows packages
+        if: steps.gate.outputs.publish == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: Explorer-Dock-v0.2.4-Windows-x64
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Verify release files
+        if: steps.gate.outputs.publish == 'true'
+        shell: pwsh
+        run: |
+          $required = @(
+            "Explorer-Dock-v0.2.4-OBS32-Windows-x64.zip",
+            "Explorer-Dock-v0.2.4-OBS33-Windows-x64.zip"
+          )
+          foreach ($file in $required) {
+            if (-not (Test-Path $file)) {
+              throw "Required release asset is missing: $file"
+            }
+            $item = Get-Item $file
+            if ($item.Length -le 0) {
+              throw "Release asset is empty: $file"
+            }
+            Write-Host "$($item.Name) - $($item.Length) bytes"
+            Get-FileHash $file -Algorithm SHA256
+          }
+
+      - name: Create the public GitHub release and upload both packages
+        if: steps.gate.outputs.publish == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BUILT_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          $tag = "v0.2.4"
+          $obs32Zip = "Explorer-Dock-v0.2.4-OBS32-Windows-x64.zip"
+          $obs33Zip = "Explorer-Dock-v0.2.4-OBS33-Windows-x64.zip"
+
+          gh release create $tag $obs32Zip $obs33Zip --repo $env:GH_REPO --title "Explorer Dock v0.2.4" --notes-file RELEASE_NOTES.md --target $env:BUILT_SHA
+          if ($LASTEXITCODE -ne 0) {
+            throw "GitHub release creation or asset upload failed."
+          }
+
+          Write-Host "Explorer Dock v0.2.4 was published with both OBS packages."
