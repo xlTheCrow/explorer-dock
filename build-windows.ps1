@@ -66,6 +66,25 @@ if ($ObsTarget -eq "OBS33") {
     $windowsBuildSpecContent = $windowsBuildSpecContent.Replace($oldArchiveName, $newArchiveName)
     $windowsBuildSpecContent = $windowsBuildSpecContent.Replace($oldSourceDirectory, $newSourceDirectory)
     Set-Content -Path $windowsBuildSpec -Value $windowsBuildSpecContent -Encoding utf8NoBOM
+
+    # OBS 33's official Windows build uses Visual Studio 2026 and Windows SDK 10.0.26100.
+    $presetsFile = Join-Path $TemplateDir "CMakePresets.json"
+    $presetsContent = Get-Content $presetsFile -Raw
+    $oldGenerator = '"generator": "Visual Studio 17 2022"'
+    $newGenerator = '"generator": "Visual Studio 18 2026"'
+    $oldWindowsSdk = '"architecture": "x64,version=10.0.22621"'
+    $newWindowsSdk = '"architecture": "x64,version=10.0.26100"'
+
+    if (-not $presetsContent.Contains($oldGenerator)) {
+        throw "Could not locate the Visual Studio generator in $presetsFile."
+    }
+    if (-not $presetsContent.Contains($oldWindowsSdk)) {
+        throw "Could not locate the Windows SDK version in $presetsFile."
+    }
+
+    $presetsContent = $presetsContent.Replace($oldGenerator, $newGenerator)
+    $presetsContent = $presetsContent.Replace($oldWindowsSdk, $newWindowsSdk)
+    Set-Content -Path $presetsFile -Value $presetsContent -Encoding utf8NoBOM
 }
 
 Push-Location $TemplateDir

@@ -7,18 +7,12 @@ on:
     branches: [ main, master ]
 
 jobs:
-  windows-x64:
+  build-obs32:
+    name: Build OBS 32 (VS 2022)
     runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Read plugin version
-        id: version
-        shell: pwsh
-        run: |
-          $spec = Get-Content "buildspec.json" -Raw | ConvertFrom-Json
-          "version=$($spec.version)" >> $env:GITHUB_OUTPUT
 
       - name: Build OBS 32 plugin
         shell: pwsh
@@ -26,17 +20,56 @@ jobs:
           Set-ExecutionPolicy -Scope Process Bypass
           ./build-windows.ps1 -ObsTarget OBS32 -Configuration RelWithDebInfo
 
+      - name: Upload OBS 32 build
+        uses: actions/upload-artifact@v4
+        with:
+          name: explorer-dock-obs32
+          path: dist/OBS32/obs-explorer-dock.*
+
+  build-obs33:
+    name: Build OBS 33 (VS 2026)
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Build OBS 33 plugin
         shell: pwsh
         run: |
           Set-ExecutionPolicy -Scope Process Bypass
           ./build-windows.ps1 -ObsTarget OBS33 -Configuration RelWithDebInfo
 
+      - name: Upload OBS 33 build
+        uses: actions/upload-artifact@v4
+        with:
+          name: explorer-dock-obs33
+          path: dist/OBS33/obs-explorer-dock.*
+
+  package:
+    name: Create both ZIP packages
+    runs-on: windows-2022
+    needs: [build-obs32, build-obs33]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download OBS 32 build
+        uses: actions/download-artifact@v4
+        with:
+          name: explorer-dock-obs32
+          path: dist/OBS32
+
+      - name: Download OBS 33 build
+        uses: actions/download-artifact@v4
+        with:
+          name: explorer-dock-obs33
+          path: dist/OBS33
+
       - name: Prepare OBS 32 and OBS 33 packages
         id: package
         shell: pwsh
         run: |
-          $version = "${{ steps.version.outputs.version }}"
+          $version = (Get-Content "buildspec.json" -Raw | ConvertFrom-Json).version
           $obs32Root = Join-Path $PWD "package/obs32"
           $obs32Bin = Join-Path $obs32Root "obs-plugins/64bit"
           $obs32Data = Join-Path $obs32Root "data/obs-plugins/obs-explorer-dock"
@@ -64,7 +97,7 @@ jobs:
           $obs32Zip = "Explorer-Dock-v$version-OBS32-Windows-x64.zip"
           $obs33Zip = "Explorer-Dock-v$version-OBS33-Windows-x64.zip"
           Compress-Archive -Path (Join-Path $obs32Root "*") -DestinationPath $obs32Zip -Force
-          Compress-Archive -Path (Join-Path $PWD "package/obs33/obs-explorer-dock") -DestinationPath $obs33Zip -Force
+          Compress-Archive -Path $obs33Root -DestinationPath $obs33Zip -Force
 
           "obs32Zip=$obs32Zip" >> $env:GITHUB_OUTPUT
           "obs33Zip=$obs33Zip" >> $env:GITHUB_OUTPUT
@@ -72,7 +105,7 @@ jobs:
       - name: Upload ready-to-install packages
         uses: actions/upload-artifact@v4
         with:
-          name: Explorer-Dock-v${{ steps.version.outputs.version }}-Windows-x64
+          name: Explorer-Dock-v0.2.4-Windows-x64
           path: |
-            ${{ steps.package.outputs.obs32Zip }}
-            ${{ steps.package.outputs.obs33Zip }}
+            Explorer-Dock-v0.2.4-OBS32-Windows-x64.zip
+            Explorer-Dock-v0.2.4-OBS33-Windows-x64.zip
