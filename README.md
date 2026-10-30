@@ -113,10 +113,10 @@ The resulting installation should look like this:
 
 A portable OBS installation keeps its plugins inside the extracted OBS folder. The portable folder is the directory that contains `bin`, `data` and the plugin folders.
 
-To enable Portable Mode, create an empty file named `portable_mode.txt` in this folder. Alternatively, start `bin\\64bit\\obs64.exe` with the `--portable` launch parameter. See the official [OBS Portable Mode guide](https://obsproject.com/kb/portable-mode).
+To enable Portable Mode, create an empty file named `portable_mode.txt` in this folder. Alternatively, start `bin\64bit\obs64.exe` with the `--portable` launch parameter. See the official [OBS Portable Mode guide](https://obsproject.com/kb/portable-mode).
 
 1. Close OBS Studio completely.
-2. Open your portable OBS folder (the folder containing `bin`, `data` and `obs-plugins`).
+2. Open your portable OBS folder (the folder containing `bin` and `data`; plugin folders may not exist yet).
 3. Copy the files from the matching Explorer Dock package as described below.
 4. Start OBS again in Portable Mode.
 
@@ -127,16 +127,16 @@ Extract the **contents** of the OBS32 ZIP into the root of your portable OBS fol
 The resulting paths should look like this:
 
 ```text
-<OBS-Portable>\\
-├── obs-plugins\\
-│   └── 64bit\\
+<OBS-Portable>\
+├── obs-plugins\
+│   └── 64bit\
 │       ├── obs-explorer-dock.dll
 │       └── obs-explorer-dock.pdb
-└── data\\
-    └── obs-plugins\\
-        └── obs-explorer-dock\\
+└── data\
+    └── obs-plugins\
+        └── obs-explorer-dock\
             ├── manifest.json
-            └── locale\\
+            └── locale\
                 ├── de-DE.ini
                 └── en-US.ini
 ```
@@ -148,19 +148,19 @@ Copy the complete `obs-explorer-dock` folder from the OBS33 ZIP into the `plugin
 The resulting paths should look like this:
 
 ```text
-<OBS-Portable>\\
-└── plugins\\
-    └── obs-explorer-dock\\
+<OBS-Portable>\
+└── plugins\
+    └── obs-explorer-dock\
         ├── obs-explorer-dock.dll
         ├── obs-explorer-dock.pdb
-        └── data\\
+        └── data\
             ├── manifest.json
-            └── locale\\
+            └── locale\
                 ├── de-DE.ini
                 └── en-US.ini
 ```
 
-**Important for OBS 33:** For portable launches, OBS loads plugins from the `plugins` folder inside the portable OBS root. It ignores the normal `%ProgramData%\\obs-studio\\plugins` location. Do not use the legacy `obs-plugins\\64bit` location for the OBS33 package. See the official [OBS plugin location and developer guide](https://obsproject.com/kb/legacy-plugin-developer-info).
+**Important for OBS 33:** For portable launches, OBS 33 loads plugins from the `plugins` folder inside the portable OBS root. It ignores the normal `%ProgramData%\obs-studio\plugins` location. Do not use the legacy `obs-plugins\64bit` location for the OBS33 package. See the official [OBS plugin location and developer guide](https://obsproject.com/kb/legacy-plugin-developer-info).
 
 ## Using the file browser dock in OBS Studio
 
