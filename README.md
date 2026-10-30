@@ -8,17 +8,22 @@
 
 **Explorer Dock** is a free, open-source **OBS Studio plugin for Windows** that embeds a native **Windows Explorer / file browser dock directly inside OBS Studio**.
 
-It is designed for streamers, video editors and creators who want faster access to **recordings, clips, thumbnails, project files and media folders** without constantly switching away from OBS. Explorer Dock works with **Windows 10 and Windows 11** and is currently built for **OBS Studio 32.x (64-bit)**.
+It is designed for streamers, video editors and creators who want faster access to **recordings, clips, thumbnails, project files and media folders** without constantly switching away from OBS. Explorer Dock works with **Windows 10 and Windows 11** and provides separate Windows x64 builds for **OBS Studio 32.x and 33.x**.
 
-> Current release: **v0.2.3** · Built for **OBS Studio 32.x / Windows x64**
+> Current release: **v0.2.4** · Separate packages for **OBS Studio 32.x and OBS Studio 33.0.x**
 
 ## Download
 
-➡️ **[Download the latest Explorer Dock release](https://github.com/xlTheCrow/explorer-dock/releases/latest)**
+➡️ **[Download Explorer Dock v0.2.4](https://github.com/xlTheCrow/explorer-dock/releases/latest)**
 
-For v0.2.3, download:
+Choose the ZIP that matches your OBS Studio major version:
 
-`Explorer-Dock-v0.2.3-Windows-x64.zip`
+| OBS Studio version | Download |
+| --- | --- |
+| **OBS 32.x** | `Explorer-Dock-v0.2.4-OBS32-Windows-x64.zip` |
+| **OBS 33.0.x** | `Explorer-Dock-v0.2.4-OBS33-Windows-x64.zip` |
+
+**Important:** Do not install both packages at the same time. Choose only the package matching your OBS Studio version.
 
 ## OBS Studio Windows Explorer Dock – Features
 
@@ -31,7 +36,7 @@ For v0.2.3, download:
 - Windows Shell drag-and-drop support
 - Remembers the last folder used by each dock
 - German and English interface strings
-- Versioned, ready-to-install Windows packages
+- Separate, versioned ready-to-install packages for OBS 32 and OBS 33
 
 ## Screenshots
 
@@ -51,22 +56,23 @@ The dock provides native Windows Explorer thumbnails, navigation controls and di
 
 - Windows 10 or Windows 11
 - 64-bit Windows
-- OBS Studio 32.x, 64-bit
+- OBS Studio 32.x or OBS Studio 33.0.x, 64-bit
 
-Other OBS versions may work, but are not currently guaranteed.
+The packages are built separately against OBS 32.0.2 and OBS 33.0.1 respectively. Later OBS point releases may work, but are not independently guaranteed. A successful CI build confirms compilation; runtime compatibility should still be checked in OBS itself.
 
 ## Install Explorer Dock for OBS Studio
 
 1. Close OBS Studio completely.
 2. Open the [latest release](https://github.com/xlTheCrow/explorer-dock/releases/latest).
-3. Download `Explorer-Dock-vX.Y.Z-Windows-x64.zip`.
-4. Extract the **contents** of the ZIP directly into your OBS Studio installation folder.
-5. Allow Windows to merge the included `obs-plugins` and `data` folders with the existing OBS folders.
-6. Start OBS Studio.
-7. Open **Tools → Windows Explorer Docks...**
-8. Create a dock, choose a folder and select **Save & Apply / Speichern & übernehmen**.
+3. Download **only** the ZIP for your OBS version.
+4. Extract the package using the matching instructions below.
+5. Start OBS Studio.
+6. Open **Tools → Windows Explorer Docks...**
+7. Create a dock, choose a folder and select **Save & Apply / Speichern & übernehmen**.
 
-The package uses the standard OBS folder layout:
+### OBS Studio 32.x – Legacy plugin folder structure
+
+Extract the **contents** of the OBS32 ZIP directly into your OBS Studio installation directory. Allow the included `obs-plugins` and `data` folders to merge with the existing OBS folders.
 
 ```text
 obs-plugins\
@@ -82,6 +88,28 @@ data\
             ├── de-DE.ini
             └── en-US.ini
 ```
+
+### OBS Studio 33.x – New plugin folder structure
+
+The OBS33 ZIP contains an `obs-explorer-dock` folder. Copy that **entire folder** into:
+
+`%ProgramData%\obs-studio\plugins`
+
+The resulting installation should look like this:
+
+```text
+%ProgramData%\obs-studio\plugins\
+└── obs-explorer-dock\
+    ├── obs-explorer-dock.dll
+    ├── obs-explorer-dock.pdb
+    └── data\
+        ├── manifest.json
+        └── locale\
+            ├── de-DE.ini
+            └── en-US.ini
+```
+
+For portable OBS installations, place the `obs-explorer-dock` folder under the portable OBS root's `plugins` directory instead.
 
 ## Using the file browser dock in OBS Studio
 
@@ -111,13 +139,12 @@ Each Explorer Dock remembers the last folder you opened.
 
 ### Explorer Dock does not appear under Tools
 
-Make sure the plugin files are located inside the OBS installation directory and that the DLL is here:
+Check that you downloaded the package for the correct OBS version and that the files are in the matching location:
 
-```text
-obs-plugins\64bit\obs-explorer-dock.dll
-```
+- **OBS 32.x:** `obs-plugins\64bit\obs-explorer-dock.dll` inside your OBS installation directory.
+- **OBS 33.x:** `%ProgramData%\obs-studio\plugins\obs-explorer-dock\obs-explorer-dock.dll`.
 
-Then restart OBS completely.
+Then restart OBS completely. If the plugin still does not appear, open **Help → Log Files → View Current Log** and include the relevant lines in a bug report.
 
 ### The dock opens, but something behaves incorrectly
 
@@ -145,22 +172,25 @@ Explorer Dock uses the official OBS plugin template build system and GitHub Acti
 The repository contains:
 
 - C++ / Qt source
-- OBS build metadata
+- separate OBS 32 and OBS 33 build specifications
 - Windows build scripts
-- automated Windows CI
-- an automated GitHub release workflow
+- automated Windows CI for both targets
+- a release workflow that creates two versioned Windows packages
 
-The `Publish Release` workflow creates versioned Windows packages such as:
+Run the build script in PowerShell:
 
-```text
-Explorer-Dock-v0.2.3-Windows-x64.zip
+```powershell
+./build-windows.ps1 -ObsTarget OBS32
+./build-windows.ps1 -ObsTarget OBS33
 ```
+
+The resulting DLLs are placed in `dist/OBS32` and `dist/OBS33`.
 
 ## AI-assisted development disclosure
 
 Development of Explorer Dock was substantially assisted by OpenAI ChatGPT.
 
-AI assistance was used for C++ implementation, build-system setup, debugging, packaging and documentation. Builds were validated through GitHub Actions, and functionality was manually tested in OBS Studio by the project owner.
+AI assistance was used for C++ implementation, build-system setup, debugging, packaging and documentation. Builds are validated through GitHub Actions. Runtime compatibility must be verified in the respective OBS versions.
 
 ## License
 
@@ -172,7 +202,6 @@ See [LICENSE](LICENSE) for the full license text.
 
 Explorer Dock is an independent community project and is **not affiliated with or endorsed by the OBS Project**.
 
-
 ## Keywords
 
-OBS Studio plugin, Windows Explorer dock, OBS file browser, OBS dock plugin, Windows 11 OBS plugin, Windows 10 OBS plugin, creator workflow, recordings browser, clips browser, media file management.
+OBS Studio plugin, Windows Explorer dock, OBS file browser, OBS dock plugin, OBS 33 plugin, OBS 32 plugin, Windows 11 OBS plugin, Windows 10 OBS plugin, creator workflow, recordings browser, clips browser, media file management.
