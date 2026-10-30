@@ -53,12 +53,18 @@ if ($ObsTarget -eq "OBS33") {
     $windowsBuildSpecContent = Get-Content $windowsBuildSpec -Raw
     $oldArchiveName = 'set(obs-studio_filename "VERSION.zip")'
     $newArchiveName = 'set(obs-studio_filename "OBS-Studio-VERSION-Sources.tar.gz")'
+    $oldSourceDirectory = 'set(obs-studio_destination "obs-studio-VERSION")'
+    $newSourceDirectory = 'set(obs-studio_destination "obs-studio-VERSION-sources")'
 
     if (-not $windowsBuildSpecContent.Contains($oldArchiveName)) {
         throw "Could not locate the OBS source archive filename in $windowsBuildSpec."
     }
+    if (-not $windowsBuildSpecContent.Contains($oldSourceDirectory)) {
+        throw "Could not locate the OBS source directory in $windowsBuildSpec."
+    }
 
     $windowsBuildSpecContent = $windowsBuildSpecContent.Replace($oldArchiveName, $newArchiveName)
+    $windowsBuildSpecContent = $windowsBuildSpecContent.Replace($oldSourceDirectory, $newSourceDirectory)
     Set-Content -Path $windowsBuildSpec -Value $windowsBuildSpecContent -Encoding utf8NoBOM
 }
 
