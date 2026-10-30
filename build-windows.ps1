@@ -73,7 +73,7 @@ if ($ObsTarget -eq "OBS33") {
     $oldGenerator = '"generator": "Visual Studio 17 2022"'
     $newGenerator = '"generator": "Visual Studio 18 2026"'
     $oldWindowsSdk = '"architecture": "x64,version=10.0.22621"'
-    $newWindowsSdk = '"architecture": "x64,version=10.0.26100"'
+    $newWindowsSdk = '"architecture": "x64,version=10.0.26100.0"'
 
     if (-not $presetsContent.Contains($oldGenerator)) {
         throw "Could not locate the Visual Studio generator in $presetsFile."

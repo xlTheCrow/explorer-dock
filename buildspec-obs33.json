@@ -2,7 +2,7 @@
   "dependencies": {
     "obs-studio": {
       "version": "33.0.1",
-      "baseUrl": "https://github.com/obsproject/obs-studio/releases/download",
+      "baseUrl": "https://github.com/obsproject/obs-studio/releases/download/33.0.1",
       "label": "OBS 33.0.1 sources",
       "hashes": {
         "windows-x64": "c8d3a8f69a0f17970ac0a8f2a2462f1bc4dacd324f6da0c4b408d442d4798913"
